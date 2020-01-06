@@ -1,0 +1,6 @@
+name: DailyRewards
+main: ru.soknight.dailyrewards.DailyRewards
+version: ${project.version}
+api-version: 1.14
+author: SoKnight
+depend: [PEconomy]
