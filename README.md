@@ -1,6 +1,6 @@
 # DailyRewards
 Daily rewards for you players. Plugin will give money when player join to your server every day. 
-Fully configurable minecraft 1.14.4 plugin. You can give dollars or euro or dollars and euro.
+Fully configurable minecraft 1.14+ plugin. You can give dollars or euro or dollars and euro.
 Enjoy!
 
 ### Depends
