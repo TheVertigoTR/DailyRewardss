@@ -17,7 +17,7 @@ public class Utils {
 	}
 	
 	public static List<String> formatRewardMessage(int day, double dollars, double euro) {
-		List<String> output = new ArrayList<>(), format = Config.REWARD_MESSAGE;
+		List<String> output = new ArrayList<>(), format = Config.getRewardMessage();
 		String fd = formatDouble(dollars), ed = formatDouble(euro), daystr = "" + day;
 		
 		format.forEach(s -> {
@@ -60,9 +60,9 @@ public class Utils {
 	
 	private static double getBonus(Player p) {
 		double bonus = 0;
-		for(String perm : Config.bonuses.keySet()) {
+		for(String perm : Config.getBonuses().keySet()) {
 			if(!p.hasPermission(perm)) continue;
-			double pbonus = Config.bonuses.get(perm);
+			double pbonus = Config.getBonuses().get(perm);
 			if(pbonus > bonus) bonus = pbonus;
 		}
 		return bonus;

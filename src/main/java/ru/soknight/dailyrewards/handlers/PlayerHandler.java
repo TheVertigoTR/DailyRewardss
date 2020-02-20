@@ -7,6 +7,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 
+import ru.soknight.dailyrewards.DailyRewards;
 import ru.soknight.dailyrewards.database.DatabaseManager;
 import ru.soknight.dailyrewards.database.Profile;
 import ru.soknight.dailyrewards.files.Config;
@@ -21,7 +22,8 @@ public class PlayerHandler implements Listener {
 		Player p = e.getPlayer();
 		String name = p.getName();
 		
-		Profile profile = DatabaseManager.getProfile(name);
+		DatabaseManager dbm = DailyRewards.getInstance().getDBManager();
+		Profile profile = dbm.getOrCreate(name);
 		
 		long lastday = profile.getLastDay();
 		long current = Utils.getCurrentDay();
@@ -34,24 +36,27 @@ public class PlayerHandler implements Listener {
 			return;
 		}
 		
-		// Send message about skipped day if is enabled
-		if(lastday != 0 && (lastday - current) > 1 && Config.getBoolean("skipped-day.enabled"))
+		// Send message about skipped day if it is enabled
+		long dayspassed = current - lastday;
+		if(stage != 0 && dayspassed > 1 && Config.getBoolean("skipped-day.enabled")) {
+			stage = 0;
 			p.sendMessage(Config.getString("skipped-day.message"));
+		}
 		
 		// Refreshing data
 		if(stage >= Config.getInt("rewards.max-queue-length")) profile.setStage(1);
 		else profile.setStage(stage + 1);
 		
 		profile.setLastDay(current);
-		DatabaseManager.setProfile(name, profile);
+		dbm.update(profile);
 		
 		// Giving reward
 		double dollars = Utils.calculateDollarsReward(p, stage);
 		double euro = Utils.calculateEuroReward(p, stage);
 		
 		try {
-			if(dollars != 0) 	PEcoAPI.addAmount(name, (float) dollars, "dollars");
-			if(euro != 0) 		PEcoAPI.addAmount(name, (float) euro, "euro");
+			if(dollars != 0) PEcoAPI.addAmount(name, (float) dollars, "dollars");
+			if(euro != 0) PEcoAPI.addAmount(name, (float) euro, "euro");
 		} catch (Exception ex) {
 			Logger.error("PEconomy is not installed, couldn't give reward to " + name + "!");
 			return;

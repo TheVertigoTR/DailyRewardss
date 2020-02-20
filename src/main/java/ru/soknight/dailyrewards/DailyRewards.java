@@ -3,6 +3,7 @@ package ru.soknight.dailyrewards;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import lombok.Getter;
 import ru.soknight.dailyrewards.database.Database;
 import ru.soknight.dailyrewards.database.DatabaseManager;
 import ru.soknight.dailyrewards.files.Config;
@@ -11,8 +12,8 @@ import ru.soknight.dailyrewards.utils.Logger;
 
 public class DailyRewards extends JavaPlugin {
 
-	private static DailyRewards instance;
-	private Database database;
+	@Getter private static DailyRewards instance;
+	@Getter private DatabaseManager DBManager;
 	
 	@Override
 	public void onEnable() {
@@ -23,32 +24,21 @@ public class DailyRewards extends JavaPlugin {
 		
 		// Loading database
 		try {
-			database = new Database();
-			DatabaseManager.loadFromDatabase();
+			Database database = new Database();
+			DBManager = new DatabaseManager(database);
 		} catch (Exception e) {
-			Logger.error("Couldn't connect database type " + Config.getString("database.type") + ":");
-			e.printStackTrace();
+			Logger.error("Database initialization failed: " + e.getLocalizedMessage());
 			Bukkit.getPluginManager().disablePlugin(this);
 			return;
 		}
 
 		// Register handler
 		Bukkit.getPluginManager().registerEvents(new PlayerHandler(), this);
-		
-		Logger.info("Enabled!");
 	}
 
 	@Override
 	public void onDisable() {
-		DatabaseManager.saveToDatabase();
-	}
-
-	public static DailyRewards getInstance() {
-		return instance;
-	}
-
-	public Database getDatabase() {
-		return database;
+		DBManager.shutdown();
 	}
 	
 }

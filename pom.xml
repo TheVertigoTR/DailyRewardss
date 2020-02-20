@@ -2,7 +2,7 @@
  	<modelVersion>4.0.0</modelVersion>
   	<groupId>ru.soknight</groupId>
   	<artifactId>dailyrewards</artifactId>
- 	<version>1.0.0</version>
+ 	<version>1.2.0</version>
   	<name>DailyRewards</name>
 
   	<repositories>
@@ -25,7 +25,7 @@
   		<dependency>
     		<groupId>com.destroystokyo.paper</groupId>
     		<artifactId>paper-api</artifactId>
-    		<version>1.14.4-R0.1-SNAPSHOT</version>
+    		<version>1.15.2-R0.1-SNAPSHOT</version>
     		<scope>provided</scope>
  		</dependency>
  		<!-- PEconomy API -->
@@ -34,6 +34,24 @@
     		<artifactId>peconomy</artifactId>
     		<version>1.0.0</version>
 		</dependency>
+		<!-- Lombok -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.18.10</version>
+            <scope>provided</scope>
+        </dependency>
+        <!-- ORMLite -->
+        <dependency>
+            <groupId>com.j256.ormlite</groupId>
+            <artifactId>ormlite-jdbc</artifactId>
+            <version>5.1</version>
+        </dependency>
+        <dependency>
+            <groupId>com.j256.ormlite</groupId>
+            <artifactId>ormlite-core</artifactId>
+            <version>5.1</version>
+        </dependency>
   	</dependencies>
 
   	<build>
@@ -59,6 +77,26 @@
                     <source>8</source>
                     <encoding>UTF-8</encoding>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>3.2.1</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <configuration>
+                            <shadedArtifactAttached>true</shadedArtifactAttached>
+                            <transformers>
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                    <mainClass>ru.soknight.dailyrewards.DailyRewards</mainClass>
+                                </transformer>
+                            </transformers>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>

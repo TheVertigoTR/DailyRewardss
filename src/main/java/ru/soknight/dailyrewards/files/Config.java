@@ -4,24 +4,24 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.HashMap;
 import java.util.Set;
-import java.util.ArrayList;
 
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 
+import lombok.Getter;
 import ru.soknight.dailyrewards.DailyRewards;
 import ru.soknight.dailyrewards.utils.Logger;
 
 public class Config {
 
-	private static FileConfiguration config;
-	
-	public static List<String> REWARD_MESSAGE = new ArrayList<>();
-	public static Map<String, Double> bonuses = new HashMap<>();
+	@Getter private static FileConfiguration config;
+	@Getter private static List<String> rewardMessage = new ArrayList<>();
+	@Getter private static Map<String, Double> bonuses = new HashMap<>();
 	
 	public static void refresh() {
 		DailyRewards instance = DailyRewards.getInstance();
@@ -38,10 +38,10 @@ public class Config {
 		}
 		config = YamlConfiguration.loadConfiguration(file);
 		
-		config.getStringList("reward-message").forEach(s -> REWARD_MESSAGE.add(s.replace("&", "\u00A7")));
+		config.getStringList("reward-message").forEach(s -> rewardMessage.add(s.replace("&", "\u00A7")));
 		
 		Set<String> keys = config.getConfigurationSection("group-bonuses").getKeys(false);
-		if(!keys.isEmpty()) 
+		if(!keys.isEmpty())
 			keys.forEach(key -> {
 				double bonus = getDouble("group-bonuses." + key);
 				bonuses.put("group." + key, bonus);
