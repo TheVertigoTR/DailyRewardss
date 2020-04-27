@@ -2,61 +2,68 @@ package ru.soknight.dailyrewards.database;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.logging.Logger;
 
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.dao.DaoManager;
 import com.j256.ormlite.support.ConnectionSource;
 
-import ru.soknight.dailyrewards.utils.Logger;
+import ru.soknight.dailyrewards.DailyRewards;
 
 public class DatabaseManager {
 	
-	private ConnectionSource source;
-	private Dao<Profile, String> dao;
+	private final Logger logger;
+	private final ConnectionSource source;
+	private final Dao<PlayerProfile, String> profilesDao;
 	
-	public DatabaseManager(Database database) throws SQLException {
-		source = database.getConnection();
-		dao = DaoManager.createDao(source, Profile.class);
+	public DatabaseManager(DailyRewards plugin, Database database) throws SQLException {
+		this.logger = plugin.getLogger();
+		this.source = database.getConnection();
+		
+		this.profilesDao = DaoManager.createDao(source, PlayerProfile.class);
 	}
 	
 	public void shutdown() {
 		try {
-			source.close();
-			Logger.info("Database connection closed.");
+			this.source.close();
+			this.logger.info("Database connection closed.");
 		} catch (IOException e) {
-			Logger.error("Failed close database connection: " + e.getLocalizedMessage());
+			this.logger.severe("Failed to close database connection: " + e.getLocalizedMessage());
 		}
 	}
 	
-	public Profile getOrCreate(String name) {
+	/*
+	 * Players profiles
+	 */
+	
+	public boolean createProfile(PlayerProfile profile) {
 		try {
-			Profile profile = dao.queryForId(name);
-			if(profile != null) return profile;
-			
-			profile = new Profile(name);
-			create(profile);
-			return profile;
+			return this.profilesDao.create(profile) != 0;
 		} catch (SQLException e) {
-			e.printStackTrace();
+			logger.severe("Failed to create profile of player '" + profile.getPlayer() + "': " + e.getMessage());
+			return false;
+		}
+	}
+	
+	public PlayerProfile getProfile(String player) {
+		try {
+			return this.profilesDao.queryForId(player);
+		} catch (SQLException e) {
+			logger.severe("Failed to get profile for player '" + player + "': " + e.getMessage());
 			return null;
 		}
 	}
 	
-	public int create(Profile profile) {
-		try {
-			return dao.create(profile);
-		} catch (SQLException e) {
-			e.printStackTrace();
-			return 0;
-		}
+	public boolean hasProfile(String player) {
+		return getProfile(player) != null;
 	}
 	
-	public int update(Profile profile) {
+	public boolean updateProfile(PlayerProfile profile) {
 		try {
-			return dao.update(profile);
+			return this.profilesDao.update(profile) != 0;
 		} catch (SQLException e) {
-			e.printStackTrace();
-			return 0;
+			logger.severe("Failed to update profile of player '" + profile.getPlayer() + "': " + e.getMessage());
+			return false;
 		}
 	}
 }

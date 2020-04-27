@@ -3,42 +3,49 @@ package ru.soknight.dailyrewards;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import lombok.Getter;
 import ru.soknight.dailyrewards.database.Database;
 import ru.soknight.dailyrewards.database.DatabaseManager;
-import ru.soknight.dailyrewards.files.Config;
-import ru.soknight.dailyrewards.handlers.PlayerHandler;
-import ru.soknight.dailyrewards.utils.Logger;
+import ru.soknight.dailyrewards.listener.PlayerJoinListener;
+import ru.soknight.lib.configuration.Configuration;
+import ru.soknight.lib.configuration.Messages;
 
 public class DailyRewards extends JavaPlugin {
-
-	@Getter private static DailyRewards instance;
-	@Getter private DatabaseManager DBManager;
+	
+	protected DatabaseManager databaseManager;
 	
 	@Override
 	public void onEnable() {
-		instance = this;
+		long start = System.currentTimeMillis();
 		
-		// Loading config file
-		Config.refresh();
+		// Configs initialization
+		Configuration pluginConfig = new Configuration(this, "config.yml");
+		pluginConfig.refresh();
 		
-		// Loading database
+		Messages messages = new Messages(this, "messages.yml");
+		
+		// Database initialization
 		try {
-			Database database = new Database();
-			DBManager = new DatabaseManager(database);
+			Database database = new Database(this, pluginConfig);
+			this.databaseManager = new DatabaseManager(this, database);
 		} catch (Exception e) {
-			Logger.error("Database initialization failed: " + e.getLocalizedMessage());
+			getLogger().severe("Failed to initialize database: " + e.getLocalizedMessage());
+			e.printStackTrace();
 			Bukkit.getPluginManager().disablePlugin(this);
 			return;
 		}
-
-		// Register handler
-		Bukkit.getPluginManager().registerEvents(new PlayerHandler(), this);
+		
+		// Join event listener initialization
+		PlayerJoinListener joinListener = new PlayerJoinListener(this, pluginConfig, messages, databaseManager);
+		getServer().getPluginManager().registerEvents(joinListener, this);
+		
+		long time = System.currentTimeMillis() - start;
+		getLogger().info("Bootstrapped in " + time + " ms.");
 	}
 
 	@Override
 	public void onDisable() {
-		DBManager.shutdown();
+		if(databaseManager != null)
+			databaseManager.shutdown();
 	}
 	
 }

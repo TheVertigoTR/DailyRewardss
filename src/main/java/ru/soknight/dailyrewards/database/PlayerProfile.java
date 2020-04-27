@@ -9,19 +9,19 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @DatabaseTable(tableName = "profiles")
-public class Profile {
+public class PlayerProfile {
 
 	@DatabaseField(id = true)
-	private String name;
+	private String player;
 	@DatabaseField(columnName = "lastday")
 	private long lastDay;
 	@DatabaseField
-	private int stage;
+	private int stageInQueue;
 	
-	public Profile(String name) {
-		this.name = name;
+	public PlayerProfile(String player) {
+		this.player = player;
 		this.lastDay = 0;
-		this.stage = 0;
+		this.stageInQueue = 0;
 	}
 	
 }

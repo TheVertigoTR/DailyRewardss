@@ -1,6 +1,6 @@
 name: ${project.name}
 main: ru.soknight.dailyrewards.DailyRewards
 version: ${project.version}
-api-version: 1.15
+api-version: 1.13
 author: SoKnight
-depend: [PEconomy]
+depend: [PEconomy, SKLibrary]
