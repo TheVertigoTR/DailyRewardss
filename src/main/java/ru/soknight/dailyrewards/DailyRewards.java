@@ -8,6 +8,20 @@ import ru.soknight.dailyrewards.database.DatabaseManager;
 import ru.soknight.dailyrewards.listener.PlayerJoinListener;
 import ru.soknight.lib.configuration.Configuration;
 import ru.soknight.lib.configuration.Messages;
+package ru.soknight.dailyrewards.utils;
+
+import me.glaremasters.itemsadder.api.ItemsAdderAPI;
+import org.bukkit.entity.Player;
+
+public class ItemsAdderUtils {
+    // Player için öğe ID'sine göre prefix al
+    public static String getItemPrefix(Player player, String itemID) {
+        // ItemsAdder'dan prefix veya görsel bilgisi çek
+        String prefix = ItemsAdderAPI.getItemIcon(itemID);  // Bu metod ile item ID'sine ait görseli alabilirsiniz
+        
+        // Eğer görsel yoksa varsayılan bir değer döndür
+        return prefix != null ? prefix : "defaultPrefix";
+
 
 public class DailyRewards extends JavaPlugin {
 	
